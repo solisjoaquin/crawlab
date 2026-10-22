@@ -1,0 +1,34 @@
+# API keys and local environment configuration
+.env
+.env.*
+!.env.example
+
+# Installed dependencies and package-manager caches
+node_modules/
+.npm/
+.pnpm-store/
+
+# Local captures, reports and generated comparison files
+/results/
+/test/**/reprocessed/
+
+# Build, test and tool output
+/dist/
+/build/
+/coverage/
+.nyc_output/
+.cache/
+*.tsbuildinfo
+*.log
+
+# Personal editor settings and temporary files
+/.vscode/
+/.idea/
+*.swp
+*.swo
+*~
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini

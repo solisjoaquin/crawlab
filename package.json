@@ -1,0 +1,7 @@
+{
+  "name": "firecrawl-lab",
+  "type": "module",
+  "scripts": { "start": "tsx server.ts", "test": "node --experimental-strip-types --test audit.test.ts processing.test.ts", "reprocess": "node --experimental-strip-types reprocess.ts" },
+  "dependencies": { "remark-gfm": "^4.0.0", "remark-parse": "^11.0.0", "unified": "^11.0.0" },
+  "devDependencies": { "@types/node": "^22.0.0", "tsx": "^4.19.0" }
+}
