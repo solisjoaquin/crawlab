@@ -27,16 +27,17 @@ input[type=text]{border-radius:8px;padding:12px;font-size:13px}button{background
 .options-row{padding:0 24px 22px;gap:10px}.options-row b{flex-basis:100%;font-size:12px;font-weight:500;color:var(--mute);margin-bottom:2px}.options-row label{border:1px solid var(--line);border-radius:6px;padding:7px 10px;font:11px ui-monospace,monospace;background:var(--bg)}.options-row label:has(input:checked){background:#fff5ef;border-color:#ffd5c0}.tag-row{padding:0 24px 24px;align-items:stretch}.field{flex:1;min-width:0;display:flex;flex-direction:column;align-items:stretch;gap:7px;font-size:12px;color:#595959;cursor:default}.field input{width:100%;min-width:0;background:var(--bg)}.post-row{border-top:1px solid var(--line);background:#fcfcfc;padding:16px 24px;font-size:12px;justify-content:space-between}.post-row b{font-weight:500}.post-row label{color:#595959}.run-note{text-align:center;color:var(--mute);font:11px ui-monospace,monospace;margin:16px 0 30px}.empty{border:1px dashed #d9d9d9;border-radius:12px;text-align:center;padding:36px 20px;background:#f9f9f9e8}.empty-icon{font:23px ui-monospace,monospace;color:var(--hot)}.empty h2{font-size:15px;font-weight:500;margin:12px 0 5px}.empty p{color:var(--mute);font-size:13px;margin:0}.grid{gap:16px;margin-top:24px}.col{border-radius:12px;overflow:hidden}.col:last-child{border-color:#ffc4a5}.col h2{padding:20px 18px 8px;font-size:14px;font-weight:600}.col small{padding:0 18px 12px;font-size:11px}.st{background:var(--bg);padding:12px 18px;font:11px/1.6 ui-monospace,monospace;gap:6px 12px}.st b{color:#b23c0a}pre{padding:18px;font-size:12px;line-height:1.8;min-height:160px}#msg{font-size:13px;margin:0}#msg:not(:empty){padding:14px 18px;margin:16px 0;border:1px solid #ffdac7;border-radius:8px;background:#fff5ef;color:#a43608}footer{display:flex;justify-content:space-between;gap:16px;margin-top:44px;padding-top:20px;border-top:1px solid #dedede;color:var(--mute);font-size:11px}
 @media(max-width:900px){.grid{grid-template-columns:1fr}}@media(max-width:600px){.top-inner{padding:0 18px}nav{gap:12px}nav a:first-child{display:none}main{padding:0 16px 24px}.hero{padding:40px 8px 28px}.hero h1{letter-spacing:-1.4px}.url-row{flex-wrap:wrap;padding:18px}.url-field{flex-basis:100%}.url-row button{width:100%}.options-row,.tag-row{padding-left:18px;padding-right:18px}.tag-row{flex-direction:column;gap:16px}.post-row{padding:16px 18px;gap:12px}.endpoint{font-size:10px}.form-heading{padding:16px 18px}footer{flex-wrap:wrap}}
 .url-field{gap:0;cursor:text;transition:border-color .15s,box-shadow .15s}.url-field:focus-within{border-color:var(--hot);box-shadow:0 0 0 3px #fa5d1926;outline:2px solid #a73305;outline-offset:3px}.url-field input:focus,.url-field input:focus-visible{outline:none;box-shadow:none}.url-field:focus-within span{color:var(--hot)}
+@media(min-width:901px){.grid.with-original{grid-template-columns:repeat(3,minmax(0,1fr))}}
 </style></head><body>
-<header class="topbar"><div class="top-inner"><div class="brand"><span>Crawlab</span><span class="lab-tag">LAB</span></div></div></header>
+<header class="topbar"><div class="top-inner"><div class="brand"><span>Crawlab</span><span class="lab-tag">LAB</span></div><nav aria-label="Main navigation"><a href="/how-it-works" style="display:inline">How it works?</a></nav></div></header>
 <main>
 <section class="hero"><div class="eyebrow">SCRAPE · COMPARE · REFINE</div><h1>Less noise.<br><span>Better web data.</span></h1>
-<p class="sub">Explore what makes a cleaner scrape. Compare Firecrawl options and fine-tune your output, side by side.</p></section>
+<p class="sub">Compare one Firecrawl response with its locally processed output, side by side.</p></section>
 <form id="f">
  <div class="form-heading"><span>Configure your scrape</span><span class="endpoint">POST /v2/scrape</span></div>
  <div class="row url-row"><label class="url-field" for="url"><span aria-hidden="true">↗</span><input type="text" id="url" aria-label="Website URL" placeholder="https://react.dev/learn" required></label><button id="go">Compare outputs →</button></div>
  <div class="row options-row"><b>Firecrawl options</b>
-  <label><input type="checkbox" id="omc" checked> onlyMainContent</label>
+  <label><input type="checkbox" id="original-response"> original response</label>
   <label><input type="checkbox" class="ex" value="nav"> exclude nav</label>
   <label><input type="checkbox" class="ex" value="footer"> exclude footer</label>
   <label><input type="checkbox" class="ex" value="button"> exclude button</label>
@@ -45,18 +46,18 @@ input[type=text]{border-radius:8px;padding:12px;font-size:13px}button{background
  <div class="row tag-row"><label class="field" for="cex">Additional tags to exclude<input type="text" id="cex" placeholder=".sandpack, header"><span>Comma-separated tags or CSS selectors</span></label><label class="field" for="inc">Tags to include<input type="text" id="inc" placeholder="article, main"><span>Comma-separated tags or CSS selectors</span></label></div>
  <div class="row post-row"><b>Local post-processing</b><label for="page-type">Page type <select id="page-type" style="padding:7px;border:1px solid var(--line);border-radius:6px"><option value="auto">Auto-detect</option><option value="article">Article</option><option value="collection">Collection / category</option></select></label><label><input type="checkbox" id="cleanup" checked> Build narration / collection; archive sources separately</label><label><input type="checkbox" id="code"> Skip code blocks (local cleanup only)</label></div>
 </form>
-<p class="run-note">One comparison · two scrapes · before and after</p>
-<p class="run-note">Baseline: markdown with onlyMainContent off. Summary changes the content, not just its formatting.<br>Sources and metadata are archived separately from narration. Auto-detection supports Medium category URLs.<br>Token counts are estimates (characters ÷ 4). Smaller output does not measure quality. Separate scrapes may differ.</p>
+<p class="run-note">One Firecrawl request by default &middot; enable original response for a second capture</p>
+<p class="run-note">Left: API response with your selected filters and format. Right: local processing of the same response.<br>With local cleanup off, both columns show the same text. Summary changes the content, not just its formatting.<br>Optional third column: independent Markdown capture with onlyMainContent off and no tag filters.<br>Token counts are estimates (characters / 4). Smaller output does not measure quality.</p>
 <div id="msg" role="status" aria-live="polite"></div>
 <section id="processing-summary" hidden style="margin:18px 0;padding:18px;border:1px solid var(--line);border-radius:10px;background:var(--card)"><h2 style="font-size:15px;margin:0 0 10px">Extraction and preservation</h2><p id="processing-info" style="font-size:13px;white-space:pre-wrap"></p><ul id="processing-warnings" style="font-size:13px"></ul><details><summary>Metadata, sections, sources and processing log</summary><pre id="structured-data"></pre></details></section>
-<section class="empty" id="empty"><div class="empty-icon" aria-hidden="true">[ → ]</div><h2>Your next clean scrape starts here</h2><p>Enter a URL above to compare the baseline with your configured and cleaned output.</p></section>
+<section class="empty" id="empty"><div class="empty-icon" aria-hidden="true">[ → ]</div><h2>Your next clean scrape starts here</h2><p>Enter a URL above to compare the API response with its locally processed output.</p></section>
 <div class="grid" id="out" hidden></div>
-<div id="save-panel" hidden style="margin-top:20px"><button id="save" type="button">Save comparison locally ↓</button><p id="save-status" role="status" aria-live="polite" style="font-size:13px;overflow-wrap:anywhere">Save API responses, before/after text and parameters to the project’s results folder.</p></div>
+<div id="save-panel" hidden style="margin-top:20px"><button id="save" type="button">Save comparison locally ↓</button><p id="save-status" role="status" aria-live="polite" style="font-size:13px;overflow-wrap:anywhere">Save the API response, before/after text and parameters to the project’s results folder.</p></div>
 <footer><span>Crawlab · A playground for cleaner web data</span><span>Powered by the Firecrawl API</span></footer>
 </main>
 <script>
 const $=id=>document.getElementById(id), list=s=>s.split(',').map(x=>x.trim()).filter(Boolean);
-const cols=[['base','Baseline','Markdown · onlyMainContent: false'],['cleaned','Configured output','Your selected API options']];
+const cols=[['base','Firecrawl output','onlyMainContent: true; selected API filters and format'],['cleaned','Local output','Same capture; optional local cleanup']];
 let comparisonId=null;
 $('save').onclick=async()=>{
  if(!comparisonId){$('save-status').textContent='Restart the server (Ctrl+C, then npm start) and run a new comparison before saving.';return;}
@@ -66,27 +67,27 @@ $('save').onclick=async()=>{
  finally{$('save').disabled=false}
 };
 $('cleanup').onchange=()=>{$('code').disabled=!$('cleanup').checked};
-$('f').onsubmit=async e=>{e.preventDefault();$('go').disabled=true;$('go').textContent='Comparing…';$('msg').textContent='Querying Firecrawl (2 scrapes)…';$('out').hidden=true;$('empty').hidden=true;
+$('f').onsubmit=async e=>{e.preventDefault();$('go').disabled=true;$('go').textContent='Comparing…';$('msg').textContent='Querying Firecrawl ('+($('original-response').checked?'2 scrapes':'1 scrape')+')…';$('out').hidden=true;$('empty').hidden=true;
  $('save-panel').hidden=true;comparisonId=null;
  $('processing-summary').hidden=true;
- const options={onlyMainContent:$('omc').checked,summary:$('sum').checked,
+ const options={summary:$('sum').checked,
   excludeTags:[...document.querySelectorAll('.ex:checked')].map(c=>c.value).concat(list($('cex').value)),includeTags:list($('inc').value)};
- try{const r=await fetch('/',{method:'POST',body:JSON.stringify({url:$('url').value,options,pageType:$('page-type').value||'auto',localCleanup:$('cleanup').checked,skipCode:$('cleanup').checked && $('code').checked})});
-  const d=await r.json();if(d.error)throw new Error(d.error);$('msg').textContent='';render(d);comparisonId=d.comparisonId;$('save-panel').hidden=false;$('save').disabled=!comparisonId;$('save-status').textContent=comparisonId?'Save API responses, before/after text and parameters to the project’s results folder.':'The running server is outdated. Restart it (Ctrl+C, then npm start) and run a new comparison to enable saving.';}
+ try{const r=await fetch('/',{method:'POST',body:JSON.stringify({url:$('url').value,options,originalResponse:$('original-response').checked,pageType:$('page-type').value||'auto',localCleanup:$('cleanup').checked,skipCode:$('cleanup').checked && $('code').checked})});
+  const d=await r.json();if(d.error)throw new Error(d.error);$('msg').textContent='';render(d);comparisonId=d.comparisonId;$('save-panel').hidden=false;$('save').disabled=!comparisonId;$('save-status').textContent=comparisonId?'Save the API response, before/after text and parameters to the project’s results folder.':'The running server is outdated. Restart it (Ctrl+C, then npm start) and run a new comparison to enable saving.';}
  catch(err){$('msg').textContent='Error: '+err.message;$('empty').hidden=false}$('go').disabled=false;$('go').textContent='Compare outputs →'};
-function render(d){const o=$('out');o.innerHTML='';o.hidden=false;const b=d.base.stats;
+function render(d){const o=$('out');o.innerHTML='';o.hidden=false;o.className=d.original?'grid with-original':'grid';const b=d.base.stats;
  if(d.structured){
   const s=d.structured,m=s.metadata;
   $('processing-summary').hidden=false;
   const available=key=>m[key]?.value||'Not found';
-  $('processing-info').textContent=`Type: ${s.kind} · Input: ${s.inputFormat} · Local processing in right column: ${d.cleaned.localCleanup?'ON':'OFF'}\nTitle: ${available('title')}\nAuthor: ${available('author')}\nPublished: ${available('publishedAt')} · Updated: ${available('updatedAt')}\nArchived links: ${s.links.length} · Supplements: ${s.supplements.length} · Logged exclusions: ${s.omissions.length}`+(s.kind==='collection'?(d.coverage.comparable===false?'\nCollection coverage cannot be compared for a summary input.':`\nArticle URLs: ${d.coverage.baselineArticles} baseline → ${d.coverage.configuredArticles} configured. Missing: ${d.coverage.missingArticles.length}.`):'');
+  $('processing-info').textContent=`Type: ${s.kind} · Input: ${s.inputFormat} · Local processing in right column: ${d.cleaned.localCleanup?'ON':'OFF'}\nTitle: ${available('title')}\nAuthor: ${available('author')}\nPublished: ${available('publishedAt')} · Updated: ${available('updatedAt')}\nArchived links: ${s.links.length} · Supplements: ${s.supplements.length} · Logged exclusions: ${s.omissions.length}`+(s.kind==='collection'?`\nCaptured article cards: ${s.items.length}. ${d.original?(d.coverage.comparable?`Original: ${d.coverage.baselineArticles}; configured: ${d.coverage.configuredArticles}; missing: ${d.coverage.missingArticles.length}.`:'Coverage is not comparable for summary input.'):'One capture; independent coverage comparison is unavailable.'}`:'');
   $('structured-data').textContent=JSON.stringify({structured:s,coverage:d.coverage},null,2);
   $('processing-warnings').innerHTML='';
   for(const message of s.warnings){const li=document.createElement('li');li.textContent=message;$('processing-warnings').append(li)}
  }
- for(const[k,t,s]of cols){const x=d[k],st=x.stats,c=document.createElement('div');c.className='col';
+ for(const[k,t,s]of [...cols,...(d.original?[['original','Original response','Markdown; onlyMainContent: false; no tag filters']]:[])]){const x=d[k],st=x.stats,c=document.createElement('div');c.className='col';
   const change=b.chars?Math.round(Math.abs(1-st.chars/b.chars)*100):null;
-  const dl=k==='base'?'':` <span>${change===null?'Character change: N/A (empty baseline)':st.chars===b.chars?'Same character count':`${change}% ${st.chars<b.chars?'fewer':'more'} characters`}</span>`;
+  const dl=k!=='cleaned'?'':` <span>${change===null?'Character change: N/A (empty baseline)':st.chars===b.chars?'Same character count':`${change}% ${st.chars<b.chars?'fewer':'more'} characters`}</span>`;
   const title=k==='cleaned'&&x.localCleanup?(d.structured?.kind==='collection'?'Collection output':'Narration output'):t;
   c.innerHTML=`<h2>${title}</h2><small>${s}${k==='cleaned'?(x.localCleanup?' · local cleanup ON':' · local cleanup OFF'):''}${x.status?` · HTTP ${x.status}`:''}${x.ms?` · ${x.ms} ms`:''}</small>
    <div class="st"><span>${st.chars} characters</span><span>~${st.tokens} estimated tokens</span><span>${st.links} Markdown links</span><span>${st.images} Markdown images</span><span>known-pattern matches (not a quality score): <b>${st.noise}</b></span>${dl}</div><pre class="output-text"></pre><details style="padding:14px"><summary>Request parameters and processing</summary><pre class="request-info"></pre></details>`;

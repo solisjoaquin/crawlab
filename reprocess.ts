@@ -14,9 +14,11 @@ for (const folder of folders) {
   const original = processDocument(baseline.data.markdown, { url: comparison.url, metadata: baseline.data.metadata, capturedAt: comparison.createdAt });
   const structured = processDocument(configured.data.markdown ?? configured.data.summary, {
     url: comparison.url, metadata: configured.data.metadata, fallbackMetadata: baseline.data.metadata, fallbackFields: original.metadata,
-    format: comparison.cleaned.request.formats[0], capturedAt: comparison.createdAt, skipCode: comparison.cleaned.skipCode,
+    format: comparison.cleaned.request.formats[0], capturedAt: comparison.createdAt, skipCode: comparison.cleaned.skipCode, kind: comparison.structured?.kind || 'auto',
   });
-  const coverage = compareCoverage(original, structured);
+  const coverage = comparison.captureMode === 'single'
+    ? { comparable: false, baselineArticles: structured.items.length, configuredArticles: structured.items.length, missingArticles: [], addedArticles: [], note: 'Single capture; independent collection coverage comparison is unavailable.' }
+    : compareCoverage(original, structured);
   if (coverage.missingArticles.length) structured.warnings.push(`${coverage.missingArticles.length} baseline article URLs are absent from configured capture.`);
   const output = join(root, 'reprocessed');
   await mkdir(output, { recursive: true });

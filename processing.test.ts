@@ -37,6 +37,32 @@ test('Wikipedia regression preserves election years, removes campaigns and archi
   assert(result.sections.some(s => s.depth === 2 && s.text === 'Historia'));
 });
 
+test('Wikipedia biography keeps infobox facts and body despite Wikidata controls', () => {
+  const { result } = capture('serrano-wiki');
+  for (const value of ['21 de febrero de 1911', '20 de julio de 2005', 'fue un filólogo italiano', 'Teoría', 'Obras', '1950', '1955']) assert(result.narration.includes(value), value);
+  assert(result.narration.length > 5000);
+  assert(!/editar datos en Wikidata|Ver y modificar los datos|editar código|Obtenido de/.test(result.narration));
+  assert(result.supplements.some(s => s.title === 'Referencias'));
+  assert(!result.omissions.some(o => o.reason === 'wiki-footer' && o.markdown.includes('fue un')));
+  assert.equal(result.checks.conservativeFallbackApplied, false);
+});
+
+test('Wikipedia entity links and search words do not cut off subsequent prose', () => {
+  const result = processDocument('# Person\n\n[Entity](https://www.wikidata.org/wiki/Q123) is discussed here.\n\nBuscar\n\nBiography continues in 1955.\n\nObtenido de https://es.wikipedia.org/wiki/Person\n\nFooter text.', { url: 'https://es.wikipedia.org/wiki/Person' });
+  assert(result.narration.includes('Entity is discussed here.'));
+  assert(result.narration.includes('Biography continues in 1955.'));
+  assert(!result.narration.includes('Footer text'));
+});
+
+test('destructive cutoffs warn and conservatively recover long prose', () => {
+  const prose = 'This substantive paragraph contains historical facts from 1955 and must remain available for review. '.repeat(20);
+  const result = processDocument('# Person\n\nShort introduction.\n\nObtenido de an unexpected inline boundary\n\n'+prose, { url: 'https://es.wikipedia.org/wiki/Person' });
+  assert(result.warnings.some(w => w.includes('less than 20%')));
+  assert.equal(result.checks.conservativeFallbackApplied, true);
+  assert(result.narration.includes(prose.trim()));
+  assert(!result.omissions.some(o => o.markdown === prose.trim()));
+});
+
 test('Medium category preserves all 15 configured cards and reports the 10 missing baseline cards', () => {
   const { result, baseline } = capture('medium-by-category');
   assert.equal(result.kind, 'collection');

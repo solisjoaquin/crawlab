@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>How it works? · Crawlab</title>
+<style>
+:root{color-scheme:light;--bg:#f9f9f9;--ink:#262626;--mute:#737373;--line:#e8e8e8;--hot:#fa5d19}
+*{box-sizing:border-box}body{margin:0;color:var(--ink);background:var(--bg);background-image:radial-gradient(#dedede .65px,transparent .65px);background-size:16px 16px;font:15px/1.65 Arial,Helvetica,system-ui,sans-serif}a{color:inherit;text-decoration:none}a:hover{color:#bf3c08}a:focus-visible,button:focus-visible{outline:2px solid #a73305;outline-offset:4px}.topbar{border-bottom:1px solid var(--line);background:var(--bg)}.top-inner{max-width:1200px;min-height:76px;margin:auto;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{display:flex;align-items:center;gap:14px;font-size:22px;font-weight:700;letter-spacing:-1px}.lab-tag{font:12px ui-monospace,monospace;letter-spacing:0;border:1px solid #ddd;border-radius:6px;padding:4px 8px;color:var(--mute)}nav{font-size:13px}main{max-width:960px;margin:auto;padding:0 28px 40px}.hero{text-align:center;padding:56px 0 32px}.eyebrow{display:inline-block;color:#aa390a;background:#fff0e8;border:1px solid #ffdac7;border-radius:6px;padding:5px 10px;font:11px ui-monospace,monospace;letter-spacing:1px}h1{font-size:clamp(32px,5vw,48px);line-height:1.15;letter-spacing:-1.8px;font-weight:500;margin:22px 0 16px}.sub{max-width:620px;margin:auto;color:var(--mute);font-size:16px}.language{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:24px;font-size:13px}.toggle{width:46px;height:26px;padding:3px;border:1px solid #ec5111;border-radius:20px;background:var(--hot);cursor:pointer}.knob{display:block;background:#fff;width:18px;height:18px;border-radius:50%;transition:transform .15s}.toggle[aria-checked=true] .knob{transform:translateX(19px)}.steps{list-style:none;counter-reset:step;display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0;margin:0}.steps li{counter-increment:step;padding:24px;background:#fff;border:1px solid var(--line);border-radius:12px}.steps li:before{content:"0" counter(step);font:12px ui-monospace,monospace;color:#aa390a;background:#fff0e8;border-radius:6px;padding:6px 8px;display:inline-block}h2{font-size:17px;line-height:1.4;margin:16px 0 8px}.steps p{font-size:14px;color:#595959;margin:0}.note{margin-top:20px;padding:22px 24px;border:1px solid #ffd5c0;border-radius:12px;background:#fff5ef}.note h2{margin-top:0}.note p{font-size:14px;margin:0}code{font-size:.9em;overflow-wrap:anywhere}.back{display:inline-block;margin-top:24px;color:#aa390a;font-size:14px}footer{margin-top:40px;padding-top:20px;border-top:1px solid #dedede;color:var(--mute);font-size:11px}@media(max-width:600px){main{padding:0 16px 24px}.top-inner{padding:16px 18px}.steps{grid-template-columns:1fr}.hero{padding-top:36px}.steps li{padding:20px}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="top-inner"><a class="brand" href="/" aria-label="Crawlab home">Crawlab <span class="lab-tag">LAB</span></a><nav aria-label="Main navigation"><a href="/" data-i18n="nav">Back to playground</a></nav></div></header>
+<main>
+<section class="hero"><div class="eyebrow" data-i18n="eyebrow">FROM RESPONSE TO READABLE TEXT</div><h1 data-i18n="title">How it works?</h1><p class="sub" data-i18n="intro">Follow the journey from Firecrawl’s response to cleaner text, with sources and processing details kept separately for review.</p>
+<div class="language"><span lang="en">English</span><button class="toggle" id="language-toggle" type="button" role="switch" aria-checked="false" aria-label="Mostrar en español"><span class="knob"></span></button><span lang="es">Español</span></div></section>
+<ol class="steps">
+<li><h2 data-i18n="step1Title">Capture the page</h2><p data-i18n="step1">By default, the URL is sent to Firecrawl once with onlyMainContent enabled and your selected filters and format. Enable original response to make a second request in Markdown with onlyMainContent disabled and no tag filters.</p></li>
+<li><h2 data-i18n="step2Title">Read the response</h2><p data-i18n="step2">The app takes the requested Markdown or summary from the response and reads the available metadata. Markdown is parsed into blocks such as headings, paragraphs, lists, tables and code.</p></li>
+<li><h2 data-i18n="step3Title">Organize the content</h2><p data-i18n="step3">The page type determines the output: article text or a collection of captured article cards. Auto-detection recognizes Medium category URLs. Rules for supported sites separate interface elements and supplementary sections; other sites use a generic extraction.</p></li>
+<li><h2 data-i18n="step4Title">Build readable text</h2><p data-i18n="step4">With local cleanup enabled, Markdown formatting is converted to plain text, link labels are kept, and image markup and citation markers are removed from the narration. Tables become text rows. Code blocks are kept unless you enable “Skip code blocks”. With cleanup off, the configured API text is displayed as received.</p></li>
+<li><h2 data-i18n="step5Title">Keep context for review</h2><p data-i18n="step5">Links, available metadata, supplementary sections, captions and an omission log are stored separately from the narration. Missing metadata is not invented. You can inspect the structured details and save the original API responses and processed files locally.</p></li>
+<li><h2 data-i18n="step6Title">Compare the result</h2><p data-i18n="step6">The first column shows the configured API text. The second shows local processing of that same capture; with cleanup off, these two columns are identical. When original response is enabled, a third column shows the independent unfiltered Markdown capture. Collection coverage compares the two captures when both contain full Markdown.</p></li>
+</ol>
+<aside class="note"><h2 data-i18n="noteTitle">Less text does not always mean better text</h2><p data-i18n="note">A Firecrawl summary changes content, not just formatting. Tokens are estimated as characters / 4; noise matches are not a quality score. The first two columns share a capture. The optional original response is independent and may differ between requests. Site rules are heuristic: review warnings, sources and omissions.</p></aside>
+<a class="back" href="/" data-i18n="back">← Try a comparison</a>
+<footer data-i18n="footer">Crawlab · A playground for cleaner web data</footer>
+</main>
+<script>
+const spanish={
+nav:'Volver al laboratorio',eyebrow:'DE LA RESPUESTA AL TEXTO LEGIBLE',title:'¿Cómo funciona?',intro:'Conoce cómo la respuesta de Firecrawl se transforma en un texto más legible, con las fuentes y los detalles del procesamiento separados para su revisión.',
+step1Title:"Capturar la página",step1:"Por defecto se hace una sola llamada a Firecrawl con onlyMainContent activado y tus filtros y formato seleccionados. Activa original response para realizar una segunda llamada en Markdown con onlyMainContent desactivado y sin filtros de etiquetas.",
+step2Title:'Leer la respuesta',step2:'La aplicación toma el Markdown o el resumen solicitado y lee los metadatos disponibles. El Markdown se analiza en bloques como títulos, párrafos, listas, tablas y código.',
+step3Title:'Organizar el contenido',step3:'El tipo de página determina la salida: el texto de un artículo o una colección de tarjetas de artículos capturadas. La detección automática reconoce URLs de categorías de Medium. Las reglas para sitios compatibles separan elementos de interfaz y secciones complementarias; los demás sitios usan una extracción genérica.',
+step4Title:'Construir un texto legible',step4:'Con la limpieza local activada, el formato Markdown se convierte en texto plano, se conservan las etiquetas de los enlaces y se quitan las marcas de imágenes y citas de la narración. Las tablas pasan a ser filas de texto. Los bloques de código se conservan, salvo que actives “Skip code blocks”. Sin limpieza, se muestra el texto configurado tal como llega de la API.',
+step5Title:'Conservar el contexto para revisar',step5:'Los enlaces, metadatos disponibles, secciones complementarias, pies de imagen y un registro de omisiones se guardan por separado de la narración. Los metadatos faltantes no se inventan. Puedes consultar los detalles estructurados y guardar localmente las respuestas originales de la API y los archivos procesados.',
+step6Title:'Comparar el resultado',step6:"La primera columna muestra el texto configurado de la API. La segunda muestra su procesamiento local; sin limpieza, estas dos columnas son iguales. Al activar original response, una tercera columna muestra la captura independiente en Markdown sin filtros. La cobertura de colecciones compara ambas capturas cuando contienen Markdown completo.",
+noteTitle:'Menos texto no siempre significa mejor texto',note:"Un resumen de Firecrawl cambia el contenido, no solo el formato. Los tokens se estiman como caracteres / 4; las coincidencias de ruido no miden calidad. Las primeras dos columnas comparten captura. La respuesta original opcional es independiente y puede variar entre llamadas. Las reglas son heurísticas: revisa advertencias, fuentes y omisiones.",
+back:'← Probar una comparación',footer:'Crawlab · Un laboratorio para obtener datos web más limpios'
+};
+const elements=[...document.querySelectorAll('[data-i18n]')];
+const english=Object.fromEntries(elements.map(element=>[element.dataset.i18n,element.textContent]));
+const toggle=document.getElementById('language-toggle');
+function setLanguage(language){
+ const isSpanish=language==='es',messages=isSpanish?spanish:english;
+ document.documentElement.lang=isSpanish?'es':'en';
+ document.title=messages.title+' · Crawlab';
+ elements.forEach(element=>{element.textContent=messages[element.dataset.i18n]});
+ toggle.setAttribute('aria-checked',String(isSpanish));
+ toggle.setAttribute('aria-label',isSpanish?'Switch to English':'Mostrar en español');
+ try{localStorage.setItem('crawlab-how-language',isSpanish?'es':'en')}catch{}
+}
+toggle.addEventListener('click',()=>setLanguage(document.documentElement.lang==='es'?'en':'es'));
+let savedLanguage='en';try{savedLanguage=localStorage.getItem('crawlab-how-language')||'en'}catch{}
+setLanguage(savedLanguage);
+</script>
+</body>
+</html>

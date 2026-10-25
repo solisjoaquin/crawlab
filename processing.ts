@@ -15,7 +15,21 @@ const resolveReferences = (tree: Node) => {
   return tree;
 };
 const navigation = new Set(['editar', 'editar codigo', 'editar datos', 'edit', 'edit source', 'volver arriba', 'ir al contenido', 'saltar al contenido', 'skip to main content', 'skip to navigation', 'link for this heading', '↑']);
-const navigationLink = (n: Node) => navigation.has(normalize(text(n))) && /[?&](?:action=edit|veaction=editsource)|#(?:maincontent|main-content|bodyContent|navigation|content-area|cite_ref)/i.test(n.url || '');
+const navigationLink = (n: Node) => navigation.has(normalize(text(n))) && /[?&](?:action=edit|veaction=(?:edit|editsource))|#(?:maincontent|main-content|bodyContent|navigation|content-area|cite_ref)/i.test(n.url || '');
+const wikidataControl = (n: Node) => {
+  if (n.type !== 'link' || !n.url) return false;
+  try {
+    const url = new URL(n.url);
+    return /(^|\.)wikidata\.org$/.test(url.hostname) && /^(?:editar datos en wikidata|ver y modificar los datos en wikidata|edit on wikidata)$/.test(normalize(text(n)));
+  } catch { return false; }
+};
+// Entity links also occur inside infoboxes and prose: they are never end markers.
+const wikiFooterMarker = (n: Node) => {
+  const label = normalize(text(n));
+  return ['paragraph', 'heading'].includes(n.type) &&
+    (/^(?:obtenido de|retrieved from)\s/.test(label) ||
+      /^(?:categorias?|categorias ocultas|categories|hidden categories):?$/.test(label));
+};
 
 function plain(n: Node, skipCode: boolean): string {
   if (citation(n) || ['image', 'imageReference', 'definition', 'footnoteDefinition', 'html', 'thematicBreak'].includes(n.type)) return '';
@@ -24,7 +38,8 @@ function plain(n: Node, skipCode: boolean): string {
   if (n.type === 'break') return '\n';
   const parts = (n.children || []).map(c => plain(c, skipCode));
   const label = parts.join('');
-  if (['link', 'linkReference'].includes(n.type) && navigationLink(n)) return '';
+  if (['link', 'linkReference'].includes(n.type) && (navigationLink(n) || wikidataControl(n))) return '';
+  if (n.type === 'paragraph' && !label.replace(/[\s\[\]·|]/g, '')) return '';
   if (n.type === 'tableRow') return parts.join(' · ');
   if (['root', 'list', 'listItem', 'table', 'blockquote'].includes(n.type)) return parts.filter(Boolean).join('\n');
   return label;
@@ -160,7 +175,7 @@ export function processDocument(markdown: string, options: ProcessingOptions) {
     for (let i = 0; i < nodes.length; i++) {
       const n = nodes[i], label = tidy(text(n));
       if (i < start || i >= end) { omit(n, i < start ? 'outside-article-prefix' : 'outside-article-suffix'); continue; }
-      if (!isSummary && wiki && (/^(Obtenido de|Categoría:|Buscar$|1 idioma)/.test(label) || linksIn(n).some(l => /Control_de_autoridades|wikidata\.org\/wiki\/Q/.test(l.url || '')))) wikiFooter = true;
+      if (!isSummary && wiki && wikiFooterMarker(n)) wikiFooter = true;
       if (wikiFooter) { omit(n, 'wiki-footer'); continue; }
       if (!isSummary && wiki && n.type === 'heading' && (!supplemental || (n.depth || 1) <= supplemental.depth)) {
         const name = normalize(text(n));
@@ -169,13 +184,28 @@ export function processDocument(markdown: string, options: ProcessingOptions) {
       }
       if (supplemental) { supplemental.markdown += source(markdown, n) + '\n\n'; omit(n, 'supplement-preserved-separately'); continue; }
       if (!isSummary && wiki && linksIn(n).some(l => /meta\.wikimedia\.org\//.test(l.url || ''))) { omit(n, 'wikimedia-campaign'); continue; }
-      if (!isSummary && wiki && (/^(De Wikipedia, la enciclopedia libre|Obtenido de|Buscar$|Categoría:|1 idioma)/.test(label) || linksIn(n).some(l => /Control_de_autoridades|wikidata\.org\/wiki\/Q/.test(l.url || '')))) { omit(n, 'wiki-interface'); continue; }
+      if (!isSummary && wiki && (/^(De Wikipedia, la enciclopedia libre|Buscar$|1 idioma)/.test(label) || (n.type !== 'table' && /^control de autoridades\b/.test(normalize(label))))) { omit(n, 'wiki-interface'); continue; }
       if (!isSummary && medium && n.type === 'heading' && /^Get .+ stories in\s+your\s+inbox$/.test(label.replace(/\s+/g, ' '))) { omit(n, 'newsletter-heading'); continue; }
       if (!isSummary && medium && (/^Join Medium for free to get updates from\s+this\s+writer\.$/.test(label.replace(/\s+/g, ' ')) || /^Remember me for faster sign in$/.test(label) || /^Press enter or click to view image in full size$/.test(label))) { omit(n, 'medium-interface'); continue; }
       if (!isSummary && guardian && hasImage(n) && /Read more\s*$/.test(label) && linksIn(n).length) { omit(n, 'related-story-card'); continue; }
       if ((medium || guardian || wiki) && n.type !== 'heading' && (/^(Share|View image in fullscreen)$/.test(label) || navigation.has(normalize(label)) || /^\s*\[\s*\]\s*$/.test(tidy(plain(n, false))))) { omit(n, 'interface-control'); continue; }
       if (n.type === 'paragraph' && hasImage(n) && (!label || wiki)) { captions.push({ text: label || null, markdown: source(markdown, n), line: n.position!.start.line }); omit(n, 'image-caption-preserved-separately'); continue; }
       kept.push(n);
+    }
+  }
+  // Compare against the input, not just surviving blocks, to catch destructive cutoffs.
+  const inputPlainCharacters = nodes.map(n => tidy(plain(n, !!options.skipCode))).join('\n\n').length;
+  const retainedPlainCharacters = kept.map(n => tidy(plain(n, !!options.skipCode))).join('\n\n').length;
+  let conservativeFallbackApplied = false;
+  if (kind === 'article' && !isSummary && inputPlainCharacters > 1000 && retainedPlainCharacters < inputPlainCharacters * .2) {
+    warnings.push('Local cleanup retained less than 20% of input text. Review sources and omissions; short output is not proof of quality.');
+    const recoverable = nodes.filter(n => n.type === 'paragraph' && tidy(plain(n, false)).length >= 200 && omissions.some(o => o.line === n.position!.start.line && !['supplement-preserved-separately', 'wikimedia-campaign', 'related-story-card', 'newsletter-heading'].includes(o.reason)));
+    if (recoverable.length) {
+      kept.push(...recoverable);
+      kept.sort((a, b) => a.position!.start.offset - b.position!.start.offset);
+      for (const n of recoverable) omissions.splice(omissions.findIndex(o => o.line === n.position!.start.line), 1);
+      conservativeFallbackApplied = true;
+      warnings.push('Conservative fallback restored long paragraphs excluded by cleanup rules. They may contain interface text; review before use.');
     }
   }
   const sections = kept.map(n => ({ type: n.type, depth: n.depth ?? null, line: n.position!.start.line, markdown: source(markdown, n), text: n.type === 'code' ? plain(n, !!options.skipCode) : tidy(plain(n, !!options.skipCode)) }));
@@ -196,7 +226,7 @@ export function processDocument(markdown: string, options: ProcessingOptions) {
   return { schemaVersion: 1, kind, inputFormat: options.format || 'markdown', metadata: fields, capturedAt: options.capturedAt || null,
     cache: { state: meta.cacheState || null, cachedAt: meta.cachedAt || null },
     bodyMarkdown, sections, links: allLinks, bodyLinks, supplements, captions, items, narration, displayText, omissions, warnings,
-    checks: { retainedBlocks: kept.length, omittedBlocks: omissions.length, missingNumbersInRetainedBlocks: lostNumbers, titleAvailable: !!fields.title.value, authorAvailable: !!fields.author.value, publishedDateAvailable: !!fields.publishedAt.value, sourceLinksArchived: allLinks.length, knownPatternMatchesAreNotAQualityScore: true } };
+    checks: { inputPlainCharacters, retainedPlainCharacters, conservativeFallbackApplied, retainedBlocks: kept.length, omittedBlocks: omissions.length, missingNumbersInRetainedBlocks: lostNumbers, titleAvailable: !!fields.title.value, authorAvailable: !!fields.author.value, publishedDateAvailable: !!fields.publishedAt.value, sourceLinksArchived: allLinks.length, knownPatternMatchesAreNotAQualityScore: true } };
 }
 
 export function compareCoverage(baseline: ReturnType<typeof processDocument>, configured: ReturnType<typeof processDocument>) {
